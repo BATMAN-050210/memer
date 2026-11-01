@@ -42,6 +42,13 @@ export interface Meme {
   topText?: string;
   bottomText?: string;
   imageUrl: string;
+  videoUrl?: string;
+  youtubeId?: string;
+  audioUrl?: string;
+  audioTitle?: string;
+  mediaType?: 'image' | 'video' | 'youtube' | 'audio';
+  sourcePlatform?: 'reddit' | 'instagram' | 'youtube' | 'original';
+  sourceSubreddit?: string;
   category: string;
   humorLevel: HumorLevel;
   tags: string[];

@@ -3,9 +3,11 @@ import { Meme } from './types';
 import { INITIAL_MEMES } from './data/memesData';
 import { MemeFeedCard } from './components/MemeFeedCard';
 import { DiwaliSidebar } from './components/DiwaliSidebar';
-import { Search, X, Loader2, Sparkles, RefreshCw } from 'lucide-react';
-import { extractFreshDarkMemes } from './services/memeExtractor';
+import { Search, X, Loader2, Sparkles, RefreshCw, Volume2, Film, Flame } from 'lucide-react';
+import { extractFreshIndianDankMemes } from './services/memeExtractor';
 import { playPopSound } from './utils/audio';
+
+type ChannelFilter = 'all' | 'idm' | 'tanmay' | 'media' | 'dark';
 
 export function App() {
   const [memes, setMemes] = useState<Meme[]>(INITIAL_MEMES);
@@ -19,27 +21,28 @@ export function App() {
   });
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [channelFilter, setChannelFilter] = useState<ChannelFilter>('all');
   const [mobileTab, setMobileTab] = useState<'feed' | 'diwali'>('feed');
   const [visibleCount, setVisibleCount] = useState(12);
   const [isFetchingExtra, setIsFetchingExtra] = useState(false);
   const loaderRef = useRef<HTMLDivElement>(null);
 
-  // Background meme extraction (from Reddit / public meme feeds)
+  // Background meme extraction from r/IndianDankMemes, r/desimemes, and Meme-API
   useEffect(() => {
     let isMounted = true;
     const loadFreshMemes = async () => {
       setIsFetchingExtra(true);
       try {
-        const fresh = await extractFreshDarkMemes();
+        const fresh = await extractFreshIndianDankMemes();
         if (isMounted && fresh.length > 0) {
           setMemes((prev) => {
-            const existingUrls = new Set(prev.map((m) => m.imageUrl));
-            const newUnique = fresh.filter((m) => !existingUrls.has(m.imageUrl));
+            const existingUrls = new Set(prev.map((m) => m.videoUrl || m.imageUrl));
+            const newUnique = fresh.filter((m) => !existingUrls.has(m.videoUrl || m.imageUrl));
             return [...prev, ...newUnique];
           });
         }
       } catch (err) {
-        console.warn('Could not extract external memes, using built-in vault:', err);
+        console.warn('Could not extract external Indian memes, using curated vault:', err);
       } finally {
         if (isMounted) setIsFetchingExtra(false);
       }
@@ -79,17 +82,46 @@ export function App() {
     };
   }, [memes.length]);
 
-  // Search filter
+  // Filter memes by search query & channel tab
   const filteredMemes = useMemo(() => {
-    if (!searchQuery.trim()) return memes;
-    const q = searchQuery.toLowerCase().trim();
-    return memes.filter(
-      (m) =>
-        m.title.toLowerCase().includes(q) ||
-        m.caption.toLowerCase().includes(q) ||
-        m.tags.some((t) => t.toLowerCase().includes(q))
-    );
-  }, [memes, searchQuery]);
+    let result = memes;
+
+    // Channel / Category filter
+    if (channelFilter === 'idm') {
+      result = result.filter(
+        (m) =>
+          m.sourceSubreddit === 'r/IndianDankMemes' ||
+          m.tags.includes('indiandankmemes') ||
+          m.category === 'indian-dank'
+      );
+    } else if (channelFilter === 'tanmay') {
+      result = result.filter(
+        (m) =>
+          m.category === 'tanmay-reacts' ||
+          m.tags.includes('tanmaybhat') ||
+          Boolean(m.youtubeId)
+      );
+    } else if (channelFilter === 'media') {
+      result = result.filter((m) => Boolean(m.audioUrl || m.videoUrl || m.youtubeId));
+    } else if (channelFilter === 'dark') {
+      result = result.filter((m) => m.humorLevel === 5);
+    }
+
+    // Search query filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      result = result.filter(
+        (m) =>
+          m.title.toLowerCase().includes(q) ||
+          m.caption.toLowerCase().includes(q) ||
+          m.creator.handle.toLowerCase().includes(q) ||
+          (m.audioTitle && m.audioTitle.toLowerCase().includes(q)) ||
+          m.tags.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+
+    return result;
+  }, [memes, channelFilter, searchQuery]);
 
   const displayedMemes = filteredMemes.slice(0, visibleCount);
   const hasMore = visibleCount < filteredMemes.length;
@@ -110,16 +142,24 @@ export function App() {
     });
   };
 
+  const channelTabs: Array<{ id: ChannelFilter; label: string; icon?: React.ReactNode }> = [
+    { id: 'all', label: '🔥 All' },
+    { id: 'idm', label: '🇮🇳 r/IndianDankMemes' },
+    { id: 'tanmay', label: '🎬 Tanmay Reacts' },
+    { id: 'media', label: '🔊 MP3 & Videos' },
+    { id: 'dark', label: '💀 80% Dark' },
+  ];
+
   return (
     <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans selection:bg-rose-500/20 selection:text-white">
       
       {/* 1. Sleek Minimal Aesthetic Header */}
-      <header className="sticky top-0 z-40 bg-[#09090b]/90 backdrop-blur-md border-b border-zinc-800/80 px-4 sm:px-6 py-3">
-        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+      <header className="sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-md border-b border-zinc-800/80 px-4 sm:px-6 py-2.5">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           
-          {/* Brand: "memer" and in small "by vedansh" - No logo icon, no '80% dark' badge */}
+          {/* Brand: "memer" and in small "by vedansh" */}
           <div
-            className="flex flex-col cursor-pointer select-none group"
+            className="flex flex-col cursor-pointer select-none group flex-shrink-0"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             <span className="font-display text-2xl sm:text-3xl font-black tracking-tight text-white group-hover:text-zinc-200 transition-colors leading-none">
@@ -133,10 +173,10 @@ export function App() {
           {/* Search bar: Clean minimal dark pill */}
           <div className="flex-1 max-w-xs sm:max-w-sm relative">
             <div className="relative flex items-center rounded-full bg-zinc-900/90 border border-zinc-800 focus-within:border-zinc-600 focus-within:ring-1 focus-within:ring-zinc-600 transition-all">
-              <Search className="w-4 h-4 text-zinc-500 ml-3.5 flex-shrink-0" />
+              <Search className="w-3.5 h-3.5 text-zinc-500 ml-3.5 flex-shrink-0" />
               <input
                 type="text"
-                placeholder="Search dark jokes, corporate, exams..."
+                placeholder="Search Tanmay, Arpit Bala, JEE, dark roasts..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-transparent py-1.5 px-2.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none"
@@ -153,7 +193,7 @@ export function App() {
           </div>
 
           {/* Mobile Tab Switcher in Header for quick access */}
-          <div className="lg:hidden flex items-center bg-zinc-900 border border-zinc-800 rounded-full p-0.5">
+          <div className="lg:hidden flex items-center bg-zinc-900 border border-zinc-800 rounded-full p-0.5 flex-shrink-0">
             <button
               onClick={() => {
                 playPopSound();
@@ -183,6 +223,30 @@ export function App() {
           </div>
 
         </div>
+
+        {/* Channel Navigation Pills Bar */}
+        <div className="max-w-6xl mx-auto pt-2.5 pb-0.5 flex items-center gap-2 overflow-x-auto hide-scrollbar">
+          {channelTabs.map((tab) => {
+            const isActive = channelFilter === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  playPopSound();
+                  setChannelFilter(tab.id);
+                  setVisibleCount(12);
+                }}
+                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all border ${
+                  isActive
+                    ? 'bg-zinc-100 text-zinc-900 border-zinc-200 font-semibold shadow-sm'
+                    : 'bg-zinc-900/80 text-zinc-400 border-zinc-800 hover:bg-zinc-800 hover:text-zinc-200'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
       </header>
 
       {/* 2. Main Content Grid: Feed on Left + Diwali Sidebar on Right */}
@@ -195,7 +259,7 @@ export function App() {
           }`}>
             
             {/* Stream Subheader with subtle counter */}
-            <div className="flex items-center justify-between mb-4 px-1 text-xs text-zinc-500">
+            <div className="flex items-center justify-between mb-3 px-1 text-xs text-zinc-500">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span className="font-medium text-zinc-400">
@@ -203,13 +267,13 @@ export function App() {
                 </span>
                 {isFetchingExtra && (
                   <span className="text-[10px] text-zinc-500 flex items-center gap-1">
-                    <Loader2 className="w-3 h-3 animate-spin" /> extracting fresh...
+                    <Loader2 className="w-3 h-3 animate-spin" /> extracting r/IndianDankMemes...
                   </span>
                 )}
               </div>
 
               <span className="text-[11px] text-zinc-500 hidden sm:inline">
-                Double tap to heart
+                Double tap to heart ❤️
               </span>
             </div>
 
@@ -241,10 +305,10 @@ export function App() {
                   <div className="py-8 text-center text-xs text-zinc-500 bg-[#121215] rounded-2xl p-6 border border-zinc-800/80">
                     <span className="text-2xl block mb-2">✨</span>
                     <span className="font-semibold text-zinc-300 text-sm block">
-                      You're all caught up!
+                      You've caught up with the stream!
                     </span>
                     <p className="mt-1 text-zinc-500">
-                      You scrolled through {filteredMemes.length} memes. Check out the Diwali roasts!
+                      Scrolled through {filteredMemes.length} memes. Switch tabs or check Diwali roasts!
                     </p>
                   </div>
                 )}
@@ -253,7 +317,7 @@ export function App() {
 
           </main>
 
-          {/* Right Side Section: Diwali Roasts (Kept as requested, aesthetic styled) */}
+          {/* Right Side Section: Diwali Roasts */}
           <div className={`lg:col-span-5 xl:col-span-4 max-w-lg mx-auto w-full ${
             mobileTab === 'feed' ? 'hidden lg:block' : 'block'
           }`}>
