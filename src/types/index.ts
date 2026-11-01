@@ -49,6 +49,7 @@ export interface Meme {
   mediaType?: 'image' | 'video' | 'youtube' | 'audio';
   sourcePlatform?: 'reddit' | 'instagram' | 'youtube' | 'original';
   sourceSubreddit?: string;
+  sourceUrl?: string;
   category: string;
   humorLevel: HumorLevel;
   tags: string[];

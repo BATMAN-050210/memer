@@ -1,5 +1,6 @@
 import { Meme } from '../types';
 import { USER_UPLOADED_MEMES } from '../services/userMemes';
+import { REDDIT_LINKS_MEMES } from '../services/redditCuratedLinks';
 
 export const INITIAL_MEMES: Meme[] = [
   // ==========================================
@@ -8,83 +9,12 @@ export const INITIAL_MEMES: Meme[] = [
   ...USER_UPLOADED_MEMES,
 
   // ==========================================
-  // 🎬 TANMAY BHAT & SAMAY RAINA GOATED SHORTS
+  // 🔗 CURATED REDDIT MEMES (From /LINKS folder)
   // ==========================================
-  {
-    id: 'tanmay-short-1',
-    title: 'Tanmay Bhat & Nishant: Wheezing Over Dark Desi Memes',
-    caption: '"Bhai ye kisne banaya hai?! Jail karwaoge kya hume!" — Tanmay wheezing continuously while Nishant Tanwar loses all composure.',
-    imageUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
-    youtubeId: 'wGOn7hDb3gk',
-    category: 'tanmay-reacts',
-    humorLevel: 5,
-    tags: ['tanmaybhat', 'shorts', 'memereview', 'nishanttanwar'],
-    situation: 'Tanmay Bhat and Nishant Tanwar contagious laugh reaction',
-    language: 'Hinglish',
-    audioTitle: 'Tanmay Bhat Wheeze Laugh MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/280/280-preview.mp3',
-    creator: {
-      name: 'Tanmay Bhat',
-      handle: '@tanmaybhat',
-      isVerified: true,
-    },
-    stats: { likes: 450000, shares: 180000, views: 2400000, saves: 98000 },
-    createdAt: '2026-10-31T18:00:00Z',
-    isTrending: true,
-    moderationStatus: 'approved',
-    isOriginal: true,
-  },
-  {
-    id: 'samay-short-1',
-    title: 'Samay Raina: "Cancelled in 3... 2... 1..."',
-    caption: 'Samay Raina dropping an unhinged dark one-liner on stream while the chat explodes and Tanmay holds his head in despair.',
-    imageUrl: 'https://images.unsplash.com/photo-1516251193007-45ef944ab0c6?w=800&auto=format&fit=crop&q=80',
-    youtubeId: 'Z1BCujX3pw8',
-    category: 'tanmay-reacts',
-    humorLevel: 5,
-    tags: ['samayraina', 'shorts', 'darkhumor', 'indiasgotlatent'],
-    situation: 'Samay Raina savage roast and dark joke punchline',
-    language: 'Hinglish',
-    audioTitle: 'Vine Boom Bass Drop MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
-    creator: {
-      name: 'Samay Raina',
-      handle: '@samayrainaofficial',
-      isVerified: true,
-    },
-    stats: { likes: 520000, shares: 210000, views: 2900000, saves: 115000 },
-    createdAt: '2026-10-31T17:30:00Z',
-    isTrending: true,
-    moderationStatus: 'approved',
-    isOriginal: true,
-  },
-  {
-    id: 'tanmay-samay-collab',
-    title: 'Tanmay & Samay: Supreme Dark Meme Review Stream',
-    caption: '"Agar ye meme brand dekh le toh agli saal ka invoice cancel ho jayega." Unfiltered late night livestream banter.',
-    imageUrl: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=800&auto=format&fit=crop&q=80',
-    youtubeId: 'cI3F30-5Bv8',
-    category: 'tanmay-reacts',
-    humorLevel: 5,
-    tags: ['tanmaybhat', 'samayraina', 'stream', 'unfiltered'],
-    situation: 'Tanmay Bhat and Samay Raina reacting to r/IndianDankMemes',
-    language: 'Hinglish',
-    audioTitle: 'L Lag Gaye Emotional Violin MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2658/2658-preview.mp3',
-    creator: {
-      name: 'Honestly by Tanmay',
-      handle: '@honestlytanmay',
-      isVerified: true,
-    },
-    stats: { likes: 389000, shares: 145000, views: 1850000, saves: 87000 },
-    createdAt: '2026-10-31T16:15:00Z',
-    isTrending: true,
-    moderationStatus: 'approved',
-    isOriginal: true,
-  },
+  ...REDDIT_LINKS_MEMES,
 
   // ==========================================
-  // 🇮🇳 r/IndianDankMemes & VIRAL DESI CLASSICS
+  // 🇮🇳 VIRAL DESI & INDIAN DANK CLASSICS
   // ==========================================
   {
     id: 'idm-1',

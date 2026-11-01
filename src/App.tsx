@@ -7,7 +7,7 @@ import { Search, X, Loader2, Sparkles, RefreshCw, Volume2, Film, Flame } from 'l
 import { extractFreshIndianDankMemes } from './services/memeExtractor';
 import { playPopSound } from './utils/audio';
 
-type ChannelFilter = 'all' | 'idm' | 'tanmay' | 'media' | 'dark';
+type ChannelFilter = 'all' | 'my-memes' | 'idm' | 'links' | 'media' | 'dark';
 
 export function App() {
   const [memes, setMemes] = useState<Meme[]>(INITIAL_MEMES);
@@ -87,22 +87,19 @@ export function App() {
     let result = memes;
 
     // Channel / Category filter
-    if (channelFilter === 'idm') {
+    if (channelFilter === 'my-memes') {
+      result = result.filter((m) => m.imageUrl?.startsWith('/MEMES/'));
+    } else if (channelFilter === 'links') {
+      result = result.filter((m) => m.id.startsWith('reddit-link-') || Boolean(m.sourceUrl));
+    } else if (channelFilter === 'idm') {
       result = result.filter(
         (m) =>
           m.sourceSubreddit === 'r/IndianDankMemes' ||
           m.tags.includes('indiandankmemes') ||
           m.category === 'indian-dank'
       );
-    } else if (channelFilter === 'tanmay') {
-      result = result.filter(
-        (m) =>
-          m.category === 'tanmay-reacts' ||
-          m.tags.includes('tanmaybhat') ||
-          Boolean(m.youtubeId)
-      );
     } else if (channelFilter === 'media') {
-      result = result.filter((m) => Boolean(m.audioUrl || m.videoUrl || m.youtubeId));
+      result = result.filter((m) => Boolean(m.audioUrl || m.videoUrl));
     } else if (channelFilter === 'dark') {
       result = result.filter((m) => m.humorLevel === 5);
     }
@@ -142,11 +139,12 @@ export function App() {
     });
   };
 
-  const channelTabs: Array<{ id: ChannelFilter; label: string; icon?: React.ReactNode }> = [
-    { id: 'all', label: '🔥 All' },
+  const channelTabs: Array<{ id: ChannelFilter; label: string }> = [
+    { id: 'all', label: '🔥 All Memes' },
+    { id: 'my-memes', label: '📁 My Uploads (15)' },
+    { id: 'links', label: '🔗 Curated Reddit (16)' },
     { id: 'idm', label: '🇮🇳 r/IndianDankMemes' },
-    { id: 'tanmay', label: '🎬 Tanmay Reacts' },
-    { id: 'media', label: '🔊 MP3 & Videos' },
+    { id: 'media', label: '🔊 With MP3 Audio' },
     { id: 'dark', label: '💀 80% Dark' },
   ];
 

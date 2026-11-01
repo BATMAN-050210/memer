@@ -413,19 +413,33 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
           </p>
         </div>
 
-        {/* Minimal clean tags */}
-        {meme.tags && meme.tags.length > 0 && (
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {meme.tags.slice(0, 4).map((tag) => (
-              <span
-                key={tag}
-                className="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )}
+        {/* Minimal clean tags & source link */}
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+          {meme.tags && meme.tags.length > 0 && (
+            <>
+              {meme.tags.slice(0, 4).map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </>
+          )}
+
+          {meme.sourceUrl && (
+            <a
+              href={meme.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto text-[10px] font-semibold text-orange-400/90 hover:text-orange-300 flex items-center gap-1 bg-orange-950/40 px-2 py-0.5 rounded-full border border-orange-800/40 transition-colors"
+            >
+              <span>{meme.sourceSubreddit || 'Reddit Post'}</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>
+          )}
+        </div>
 
       </div>
 
