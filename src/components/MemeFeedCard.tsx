@@ -14,21 +14,32 @@ interface MemeFeedCardProps {
   meme: Meme;
   isLiked: boolean;
   onToggleLike: (meme: Meme) => void;
+  globalSoundEnabled?: boolean;
 }
 
 export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
   meme,
   isLiked,
   onToggleLike,
+  globalSoundEnabled = true,
 }) => {
   const [likeCount, setLikeCount] = useState(meme.stats.likes + (isLiked ? 1 : 0));
   const [showHeartBurst, setShowHeartBurst] = useState(false);
   const [shareToast, setShareToast] = useState(false);
 
-  // Audio MP3 state
+  // Audio MP3 state - unmuted by default when globalSoundEnabled is true
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(!globalSoundEnabled);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Synchronize audio state when user toggles sound mode
+  useEffect(() => {
+    setIsMuted(!globalSoundEnabled);
+    if (!globalSoundEnabled && audioRef.current) {
+      audioRef.current.pause();
+      setIsPlayingAudio(false);
+    }
+  }, [globalSoundEnabled]);
 
   // HTML5 Video state
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
@@ -37,7 +48,7 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
   // YouTube Shorts Embed state
   const [loadEmbed, setLoadEmbed] = useState(false);
 
-  // Reddit Video Embed state
+  // Reddit Video Embed state - configured for volume ON by default
   const [redditIframeLoaded, setRedditIframeLoaded] = useState(false);
   const getRedditEmbedUrl = (url?: string) => {
     if (!url) return null;
@@ -46,7 +57,7 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
       if (!parsed.hostname.includes('reddit.com')) return null;
       let pathname = parsed.pathname;
       pathname = pathname.replace(/\/+$/, '') + '/';
-      return `https://www.redditmedia.com${pathname}?ref_source=embed&ref=share&embed=true&theme=dark&showmedia=true`;
+      return `https://www.redditmedia.com${pathname}?ref_source=embed&ref=share&embed=true&theme=dark&showmedia=true&muted=0&mute=false&volume=100`;
     } catch {
       return null;
     }
@@ -70,6 +81,8 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
     if (!audioRef.current && meme.audioUrl) {
       const audio = new Audio(meme.audioUrl);
       audio.loop = true;
+      audio.volume = 1.0;
+      audio.muted = false;
       audio.onended = () => setIsPlayingAudio(false);
       audioRef.current = audio;
     }
@@ -269,15 +282,15 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
               </a>
             </div>
 
-            {/* Reddit Audio & Unmute guidance bar */}
+            {/* Reddit Audio & Mobile Unmute guidance bar */}
             <div className="w-full px-4 py-2 bg-gradient-to-r from-zinc-900 via-[#151518] to-zinc-900 border-b border-zinc-800/80 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
                 <span className="text-zinc-300 text-[11px] font-medium">
-                  Reddit Audio: <strong className="text-orange-400 font-semibold">Tap speaker 🔇 in video to unmute</strong>
+                  Phone Mode: <strong className="text-emerald-400 font-semibold">🔊 Volume ON</strong>
                 </span>
               </div>
               {meme.audioUrl && (
