@@ -2,7 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Meme } from '../types';
 import { Heart, Share2, Check, Play, Pause, Volume2, VolumeX, ExternalLink, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { playPopSound, playFlameSound } from '../utils/audio';
+import {
+  playPopSound,
+  playFlameSound,
+  playVineBoomSound,
+  playSadViolinSound,
+  playPunchlineSound,
+} from '../utils/audio';
 
 interface MemeFeedCardProps {
   meme: Meme;
@@ -76,8 +82,31 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
         audioRef.current
           .play()
           .then(() => setIsPlayingAudio(true))
-          .catch(() => setIsPlayingAudio(false));
+          .catch((err) => {
+            console.warn('Audio element playback blocked, using Web Audio fallback:', err);
+            // Instant synthesized Web Audio fallback
+            if (meme.audioTitle?.toLowerCase().includes('boom') || meme.audioTitle?.toLowerCase().includes('drop')) {
+              playVineBoomSound();
+            } else if (meme.audioTitle?.toLowerCase().includes('violin') || meme.audioTitle?.toLowerCase().includes('sad')) {
+              playSadViolinSound();
+            } else {
+              playPunchlineSound();
+            }
+            setIsPlayingAudio(true);
+            setTimeout(() => setIsPlayingAudio(false), 2200);
+          });
       }
+    } else {
+      // Direct Web Audio if no audioRef
+      if (meme.audioTitle?.toLowerCase().includes('boom')) {
+        playVineBoomSound();
+      } else if (meme.audioTitle?.toLowerCase().includes('violin')) {
+        playSadViolinSound();
+      } else {
+        playPunchlineSound();
+      }
+      setIsPlayingAudio(true);
+      setTimeout(() => setIsPlayingAudio(false), 2200);
     }
   };
 
@@ -240,6 +269,42 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
               </a>
             </div>
 
+            {/* Reddit Audio & Unmute guidance bar */}
+            <div className="w-full px-4 py-2 bg-gradient-to-r from-zinc-900 via-[#151518] to-zinc-900 border-b border-zinc-800/80 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500"></span>
+                </span>
+                <span className="text-zinc-300 text-[11px] font-medium">
+                  Reddit Audio: <strong className="text-orange-400 font-semibold">Tap speaker 🔇 in video to unmute</strong>
+                </span>
+              </div>
+              {meme.audioUrl && (
+                <button
+                  onClick={toggleAudio}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border transition-all ${
+                    isPlayingAudio
+                      ? 'bg-rose-500 text-white border-rose-400 shadow-sm shadow-rose-500/30'
+                      : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700 active:scale-95'
+                  }`}
+                  title="Play / Pause meme soundbite"
+                >
+                  {isPlayingAudio ? (
+                    <>
+                      <Pause className="w-3 h-3 text-white" />
+                      <span>Soundbite Playing</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3 h-3 text-emerald-400 fill-emerald-400" />
+                      <span>🔊 Play Soundbite</span>
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
             {/* Playable Reddit Video Embed Container */}
             <div className="relative w-full min-h-[480px] sm:min-h-[520px] bg-black flex items-center justify-center overflow-hidden">
               {!redditIframeLoaded && (
@@ -253,7 +318,7 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
               <iframe
                 src={redditEmbedUrl}
                 title={meme.title}
-                sandbox="allow-scripts allow-same-origin allow-popups"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
                 className="w-full h-[520px] border-0 bg-transparent relative z-10"
                 scrolling="no"
                 allowFullScreen

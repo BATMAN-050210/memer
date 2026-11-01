@@ -1,7 +1,7 @@
-// Web Audio API synthesized sound effects for delightful tactile feedback
+// Web Audio API synthesized sound effects and zero-latency audio players
 let audioCtx: AudioContext | null = null;
 
-function getAudioContext(): AudioContext | null {
+export function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
   if (!audioCtx) {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
@@ -67,5 +67,61 @@ export const playSuccessSound = () => {
     gain.connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.28);
+  } catch {}
+};
+
+// ==========================================
+// 🎵 ICONIC MEME SOUNDS (Local + Web Audio fallback)
+// ==========================================
+
+export const playVineBoomSound = () => {
+  try {
+    const audio = new Audio('/audio/vine-boom.wav');
+    audio.play().catch(() => {
+      // Offline Web Audio synthesis fallback
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(160, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(36, ctx.currentTime + 1.2);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 1.2);
+    });
+  } catch {}
+};
+
+export const playSadViolinSound = () => {
+  try {
+    const audio = new Audio('/audio/sad-violin.wav');
+    audio.play().catch(() => {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.setValueAtTime(415, ctx.currentTime + 0.8);
+      gain.gain.setValueAtTime(0.25, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.8);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 1.8);
+    });
+  } catch {}
+};
+
+export const playPunchlineSound = () => {
+  try {
+    const audio = new Audio('/audio/punchline.wav');
+    audio.play().catch(() => {
+      playSuccessSound();
+    });
   } catch {}
 };

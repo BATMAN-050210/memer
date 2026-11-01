@@ -3,7 +3,7 @@ import { Meme } from '../types';
 /**
  * 18 specific Reddit memes requested from the LINKS folder
  * Sourced from r/IndianDankMemes, r/FingMemes, r/SaimanSays, r/IndianMemeTemplates, r/indianmemer, r/dankmemes
- * All items are configured as authentic playable Reddit video embeds (no stock image placeholders).
+ * All items are configured with playable Reddit video embeds and guaranteed local offline audio soundbites.
  */
 export const REDDIT_LINKS_MEMES: Meme[] = [
   {
@@ -20,8 +20,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/SaimanSays',
     sourceUrl: 'https://www.reddit.com/r/SaimanSays/comments/1xbjgpl/a_fierce_counterattack_from_ravanas_side/',
     mediaType: 'video',
-    audioTitle: 'Vine Boom Bass Drop MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+    audioTitle: 'Vine Boom Bass Shockwave',
+    audioUrl: '/audio/vine-boom.wav',
     creator: {
       name: 'booby_12011995',
       handle: '@u/booby_12011995',
@@ -47,8 +47,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/FingMemes',
     sourceUrl: 'https://www.reddit.com/r/FingMemes/comments/1xkca1o/baade_harami_log_hai_yaha_pe/',
     mediaType: 'video',
-    audioTitle: 'Lord Puneet Screaming Chaos MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3',
+    audioTitle: 'Dramatic Dark Bass Boom',
+    audioUrl: '/audio/dramatic-boom.wav',
     creator: {
       name: 'Joel_joey125',
       handle: '@u/Joel_joey125',
@@ -74,6 +74,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/FingMemes',
     sourceUrl: 'https://www.reddit.com/r/FingMemes/comments/1xfpxj3/didnt_expect_this_from_rock/',
     mediaType: 'video',
+    audioTitle: 'Comedy Punchline Rimshot',
+    audioUrl: '/audio/punchline.wav',
     creator: {
       name: 'Used_Student5017',
       handle: '@u/Used_Student5017',
@@ -99,6 +101,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/FingMemes',
     sourceUrl: 'https://www.reddit.com/r/FingMemes/comments/1xj3adv/need_more_of_these_pranks/',
     mediaType: 'video',
+    audioTitle: 'Vine Boom Heart Attack Drop',
+    audioUrl: '/audio/vine-boom.wav',
     creator: {
       name: 'AcanthisittaDull2100',
       handle: '@u/AcanthisittaDull2100',
@@ -123,6 +127,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/FingMemes',
     sourceUrl: 'https://www.reddit.com/r/FingMemes/comments/1xivyyl/_/',
     mediaType: 'video',
+    audioTitle: '8-Bit Game Over Fail',
+    audioUrl: '/audio/game-over.wav',
     creator: {
       name: 'SurvivorMP',
       handle: '@u/SurvivorMP',
@@ -148,6 +154,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/FingMemes',
     sourceUrl: 'https://www.reddit.com/r/FingMemes/comments/1xd89bz/ak_potty_7/',
     mediaType: 'video',
+    audioTitle: 'Vine Boom Acoustic Resonance',
+    audioUrl: '/audio/vine-boom.wav',
     creator: {
       name: 'Curious_Beautiful269',
       handle: '@u/Curious_Beautiful269',
@@ -173,6 +181,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/FingMemes',
     sourceUrl: 'https://www.reddit.com/r/FingMemes/comments/1xckyoq/after_cid_weve_got_this/',
     mediaType: 'video',
+    audioTitle: 'Dramatic Suspense Boom',
+    audioUrl: '/audio/dramatic-boom.wav',
     creator: {
       name: 'Tall-Recognition4997',
       handle: '@u/Tall-Recognition4997',
@@ -197,6 +207,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/FingMemes',
     sourceUrl: 'https://www.reddit.com/r/FingMemes/comments/1xg62ze/yaddd/',
     mediaType: 'video',
+    audioTitle: 'Sad Nostalgia Strings',
+    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'Competitive_Side_208',
       handle: '@u/Competitive_Side_208',
@@ -222,8 +234,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/dankindianmemes',
     sourceUrl: 'https://www.reddit.com/r/dankindianmemes/comments/1xkb0lp/koi_bachao_muje/',
     mediaType: 'video',
-    audioTitle: 'L Lag Gaye Emotional Violin MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2658/2658-preview.mp3',
+    audioTitle: 'L Lag Gaye Emotional Violin',
+    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'No-Acanthisitta-1902',
       handle: '@u/No-Acanthisitta-1902',
@@ -249,6 +261,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/indianmemer',
     sourceUrl: 'https://www.reddit.com/r/indianmemer/comments/1xcaos4/apna_apna_naseeb/',
     mediaType: 'video',
+    audioTitle: 'Sad Crying Violin',
+    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'MuslimForPeace',
       handle: '@u/MuslimForPeace',
@@ -274,6 +288,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/indianmemer',
     sourceUrl: 'https://www.reddit.com/r/indianmemer/comments/1x02ahn/last_furious/',
     mediaType: 'video',
+    audioTitle: 'Vine Boom Bass Impact',
+    audioUrl: '/audio/vine-boom.wav',
     creator: {
       name: 'Agile-Ability2897',
       handle: '@u/Agile-Ability2897',
@@ -298,6 +314,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/dankmemes',
     sourceUrl: 'https://www.reddit.com/r/dankmemes/comments/1wxn7e1/cant/',
     mediaType: 'video',
+    audioTitle: '8-Bit Retro Chime',
+    audioUrl: '/audio/game-over.wav',
     creator: {
       name: 'TitanDB',
       handle: '@u/TitanDB',
@@ -322,8 +340,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     sourceUrl: 'https://www.reddit.com/r/IndianDankMemes/comments/1xj6drk/who_is_gonna_tell_bro/',
     mediaType: 'video',
-    audioTitle: 'Ashneer: Yeh Sab Doglapan Hai MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
+    audioTitle: 'Dramatic Dark Boom',
+    audioUrl: '/audio/dramatic-boom.wav',
     creator: {
       name: 'Anonymous_Ant2053',
       handle: '@u/Anonymous_Ant2053',
@@ -349,6 +367,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     sourceUrl: 'https://www.reddit.com/r/IndianDankMemes/comments/1wuhzgm/adiwasi_hair_oil/',
     mediaType: 'video',
+    audioTitle: 'Comedy Punchline Rimshot',
+    audioUrl: '/audio/punchline.wav',
     creator: {
       name: 'liberty-reels',
       handle: '@u/liberty-reels',
@@ -373,6 +393,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     sourceUrl: 'https://www.reddit.com/r/IndianDankMemes/comments/1x90w32/sabka_apna_apna_dard/',
     mediaType: 'video',
+    audioTitle: 'Sad Parle-G Emotional Violin',
+    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'SpiritualPhase5192',
       handle: '@u/SpiritualPhase5192',
@@ -398,6 +420,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     sourceUrl: 'https://www.reddit.com/r/IndianDankMemes/comments/1x8w1xc/tesla_cant_match_our_tech/',
     mediaType: 'video',
+    audioTitle: 'Desi Jugaad Rimshot',
+    audioUrl: '/audio/punchline.wav',
     creator: {
       name: 'iquizuanswer',
       handle: '@u/iquizuanswer',
@@ -423,6 +447,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianMemeTemplates',
     sourceUrl: 'https://www.reddit.com/r/IndianMemeTemplates/comments/1xf4ab9/mahabharat_behind_the_scenes/',
     mediaType: 'video',
+    audioTitle: 'Comedy Punchline Ba-Dum-Tss',
+    audioUrl: '/audio/punchline.wav',
     creator: {
       name: 'Meme4585',
       handle: '@u/Meme4585',
@@ -448,8 +474,8 @@ export const REDDIT_LINKS_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianMemeTemplates',
     sourceUrl: 'https://www.reddit.com/r/IndianMemeTemplates/comments/1xbepb8/khoon_jalta_hai/',
     mediaType: 'video',
-    audioTitle: 'Vine Boom Bass Drop MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+    audioTitle: 'Vine Boom Boiling Rage',
+    audioUrl: '/audio/vine-boom.wav',
     creator: {
       name: 'duke_v_',
       handle: '@u/duke_v_',

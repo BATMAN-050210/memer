@@ -42,7 +42,7 @@ export const USER_UPLOADED_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     mediaType: 'audio',
     audioTitle: 'Vine Boom Bass Drop MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+    audioUrl: '/audio/vine-boom.wav',
     creator: {
       name: 'Hostel Committee',
       handle: '@backbencher_union',
@@ -112,7 +112,7 @@ export const USER_UPLOADED_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     mediaType: 'audio',
     audioTitle: 'L Lag Gaye Emotional Violin MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2658/2658-preview.mp3',
+    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'uditkumarmishra7467',
       handle: '@failed_exam_gang',
@@ -185,7 +185,7 @@ export const USER_UPLOADED_MEMES: Meme[] = [
     sourceSubreddit: 'r/dankmemes',
     mediaType: 'audio',
     audioTitle: 'Vine Boom Bass Drop MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+    audioUrl: '/audio/vine-boom.wav',
     creator: {
       name: 'MCU_Shitposter',
       handle: '@thanos_regret',
@@ -211,7 +211,7 @@ export const USER_UPLOADED_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     mediaType: 'audio',
     audioTitle: 'L Lag Gaye Emotional Violin MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2658/2658-preview.mp3',
+    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'Animal_Park_VIP',
       handle: '@ranbir_roasts',
@@ -350,7 +350,7 @@ export const USER_UPLOADED_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     mediaType: 'audio',
     audioTitle: 'Lord Puneet Screaming Chaos MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3',
+    audioUrl: '/audio/dramatic-boom.wav',
     creator: {
       name: 'Ideal_Boy_Uncensored',
       handle: '@adarsh_balak',

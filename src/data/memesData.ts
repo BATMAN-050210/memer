@@ -30,7 +30,7 @@ export const INITIAL_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     mediaType: 'audio',
     audioTitle: 'Sad Phonk Melodrama MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2658/2658-preview.mp3',
+    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'Kota_Backlog_Survivor',
       handle: '@jee_dropper_2026',
@@ -55,7 +55,7 @@ export const INITIAL_MEMES: Meme[] = [
     sourcePlatform: 'instagram',
     mediaType: 'audio',
     audioTitle: 'Ashneer: Yeh Sab Doglapan Hai MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
+    audioUrl: '/audio/dramatic-boom.wav',
     creator: {
       name: 'Desi Shark Roasts',
       handle: '@sharktank_uncut',
@@ -81,7 +81,7 @@ export const INITIAL_MEMES: Meme[] = [
     sourceSubreddit: 'r/desimemes',
     mediaType: 'audio',
     audioTitle: 'Arpit Bala: Hum Pe Toh Hai Hi 9 MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3',
+    audioUrl: '/audio/punchline.wav',
     creator: {
       name: 'Bhappa Fanclub',
       handle: '@arpit_bala_clips',
@@ -106,7 +106,7 @@ export const INITIAL_MEMES: Meme[] = [
     sourcePlatform: 'instagram',
     mediaType: 'audio',
     audioTitle: 'Lord Puneet Screaming Chaos MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3',
+    audioUrl: '/audio/dramatic-boom.wav',
     creator: {
       name: 'Lord Puneet Archives',
       handle: '@puneet_superstar_official',
@@ -154,7 +154,7 @@ export const INITIAL_MEMES: Meme[] = [
     sourcePlatform: 'instagram',
     mediaType: 'audio',
     audioTitle: 'Vine Boom Bass Drop MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+    audioUrl: '/audio/vine-boom.wav',
     creator: {
       name: 'Mirzapur Meme Cell',
       handle: '@tripathi_parivar',
@@ -224,7 +224,7 @@ export const INITIAL_MEMES: Meme[] = [
     sourceSubreddit: 'r/IndianDankMemes',
     mediaType: 'audio',
     audioTitle: 'L Lag Gaye Emotional Violin MP3',
-    audioUrl: 'https://assets.mixkit.co/active_storage/sfx/2658/2658-preview.mp3',
+    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'TCS_Wipro_Survivor',
       handle: '@notice_period_gang',
