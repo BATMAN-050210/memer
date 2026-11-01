@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Meme } from '../types';
-import { Heart, Share2, Check, Play, Pause, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { Heart, Share2, Check, Play, Pause, Volume2, VolumeX, ExternalLink, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { playPopSound, playFlameSound } from '../utils/audio';
 
@@ -27,6 +27,9 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
   // HTML5 Video state
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // YouTube Shorts Embed state
+  const [loadEmbed, setLoadEmbed] = useState(false);
 
   // Stop audio on unmount
   useEffect(() => {
@@ -140,8 +143,11 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
 
   // Badge label & colors
   const getSourceBadge = () => {
-    if (meme.category === 'tanmay-reacts' || meme.youtubeId) {
+    if (meme.category === 'tanmay-reacts' || meme.tags.includes('tanmaybhat')) {
       return { text: '🎬 Tanmay Reacts', color: 'bg-rose-500/10 text-rose-400 border-rose-500/30' };
+    }
+    if (meme.tags.includes('samayraina')) {
+      return { text: '👑 Samay Raina', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30' };
     }
     if (meme.sourceSubreddit === 'r/IndianDankMemes') {
       return { text: '🇮🇳 r/IndianDankMemes', color: 'bg-orange-500/10 text-orange-400 border-orange-500/30' };
@@ -150,12 +156,13 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
       return { text: meme.sourceSubreddit, color: 'bg-blue-500/10 text-blue-400 border-blue-500/30' };
     }
     if (meme.sourcePlatform === 'instagram') {
-      return { text: '📸 Insta Meme', color: 'bg-pink-500/10 text-pink-400 border-pink-500/30' };
+      return { text: '📸 Insta Reel / Meme', color: 'bg-pink-500/10 text-pink-400 border-pink-500/30' };
     }
     return { text: '🔥 Indian Dank', color: 'bg-zinc-800 text-zinc-300 border-zinc-700' };
   };
 
   const badge = getSourceBadge();
+  const ytShortUrl = meme.youtubeId ? `https://www.youtube.com/shorts/${meme.youtubeId}` : null;
 
   return (
     <article className="w-full bg-[#121215] rounded-2xl sm:rounded-3xl border border-zinc-800/80 overflow-hidden shadow-card mb-5 select-none transition-all hover:border-zinc-700/70">
@@ -185,19 +192,69 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
         </span>
       </div>
 
-      {/* 2. Meme Media Area (YouTube Video, HTML5 Video, or Image) */}
+      {/* 2. Meme Media Area (YouTube Video/Short, HTML5 Video, or Image) */}
       <div className="relative w-full bg-black/60 overflow-hidden flex items-center justify-center">
         
-        {/* Case A: YouTube Video (Tanmay Bhat Meme Reviews & Shorts) */}
+        {/* Case A: YouTube Short / Video */}
         {meme.youtubeId ? (
-          <div className="w-full aspect-[9/16] sm:aspect-[4/3] max-h-[580px] bg-black">
-            <iframe
-              src={`https://www.youtube-nocookie.com/embed/${meme.youtubeId}?autoplay=0&rel=0&modestbranding=1`}
-              title={meme.title}
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
+          <div className="w-full bg-black flex flex-col items-center">
+            {loadEmbed ? (
+              <div className="w-full aspect-[9/16] sm:aspect-[4/3] max-h-[580px] relative bg-black">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${meme.youtubeId}?autoplay=1&enablejsapi=1&rel=0&playsinline=1`}
+                  title={meme.title}
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ) : (
+              /* High quality Short Thumbnail with click-to-play & direct link */
+              <div
+                className="relative w-full aspect-[9/16] sm:aspect-[4/3] max-h-[520px] bg-zinc-950 flex flex-col items-center justify-center cursor-pointer group overflow-hidden"
+                onClick={() => setLoadEmbed(true)}
+              >
+                <img
+                  src={meme.imageUrl || `https://i.ytimg.com/vi/${meme.youtubeId}/hqdefault.jpg`}
+                  alt={meme.title}
+                  className="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-90 transition-all duration-300"
+                  loading="lazy"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-black/50 flex flex-col justify-between p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-1 rounded-full bg-red-600 text-white font-black text-[10px] tracking-wider uppercase shadow-md flex items-center gap-1">
+                      ⚡ YouTube Short
+                    </span>
+                    <span className="text-[11px] text-zinc-300 font-medium bg-black/60 px-2 py-0.5 rounded-md backdrop-blur-sm">
+                      Tap to Play
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <div className="w-16 h-16 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-red-500 transition-all">
+                      <Play className="w-8 h-8 ml-1 fill-white" />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/10">
+                    <span className="text-xs font-semibold text-zinc-200 truncate">
+                      {meme.title}
+                    </span>
+                    <a
+                      href={ytShortUrl || `https://www.youtube.com/watch?v=${meme.youtubeId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 text-[11px] font-bold text-red-400 hover:text-red-300 bg-red-950/60 px-2.5 py-1 rounded-full border border-red-800/40 flex-shrink-0"
+                    >
+                      <span>Open Short</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         ) : meme.videoUrl ? (
           /* Case B: HTML5 Video Post */
