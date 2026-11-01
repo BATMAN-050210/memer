@@ -31,6 +31,23 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
   // YouTube Shorts Embed state
   const [loadEmbed, setLoadEmbed] = useState(false);
 
+  // Reddit Video Embed state
+  const [redditIframeLoaded, setRedditIframeLoaded] = useState(false);
+  const getRedditEmbedUrl = (url?: string) => {
+    if (!url) return null;
+    try {
+      const parsed = new URL(url);
+      if (!parsed.hostname.includes('reddit.com')) return null;
+      let pathname = parsed.pathname;
+      pathname = pathname.replace(/\/+$/, '') + '/';
+      return `https://www.redditmedia.com${pathname}?ref_source=embed&ref=share&embed=true&theme=dark&showmedia=true`;
+    } catch {
+      return null;
+    }
+  };
+  const redditEmbedUrl =
+    meme.sourcePlatform === 'reddit' && meme.sourceUrl ? getRedditEmbedUrl(meme.sourceUrl) : null;
+
   // Stop audio on unmount
   useEffect(() => {
     return () => {
@@ -192,11 +209,59 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
         </span>
       </div>
 
-      {/* 2. Meme Media Area (YouTube Video/Short, HTML5 Video, or Image) */}
+      {/* 2. Meme Media Area (Reddit Video, YouTube Video/Short, HTML5 Video, or Image) */}
       <div className="relative w-full bg-black/60 overflow-hidden flex items-center justify-center">
         
-        {/* Case A: YouTube Short / Video */}
-        {meme.youtubeId ? (
+        {/* Case 0: Reddit Video Post Embed */}
+        {redditEmbedUrl ? (
+          <div className="w-full bg-[#0a0a0c] flex flex-col items-center">
+            {/* Top Reddit Subreddit Bar */}
+            <div className="w-full px-4 py-2 bg-gradient-to-r from-orange-950/40 via-zinc-900 to-black flex items-center justify-between border-b border-orange-500/20">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-[#FF4500] flex items-center justify-center text-white font-black text-[10px] shadow-sm">
+                  r/
+                </span>
+                <span className="font-bold text-xs text-orange-400">
+                  {meme.sourceSubreddit || 'Reddit Video Meme'}
+                </span>
+                <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">
+                  {meme.creator.handle}
+                </span>
+              </div>
+              <a
+                href={meme.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF4500]/20 hover:bg-[#FF4500]/30 text-orange-300 hover:text-white text-[11px] font-semibold border border-orange-500/30 transition-all hover:scale-105 active:scale-95"
+              >
+                <span>▶ Watch on Reddit</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+
+            {/* Playable Reddit Video Embed Container */}
+            <div className="relative w-full min-h-[480px] sm:min-h-[520px] bg-black flex items-center justify-center overflow-hidden">
+              {!redditIframeLoaded && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-zinc-950 pointer-events-none">
+                  <div className="w-10 h-10 rounded-full border-2 border-orange-500 border-t-transparent animate-spin mb-3"></div>
+                  <span className="text-xs font-semibold text-zinc-300">Loading Reddit Video...</span>
+                  <span className="text-[10px] text-zinc-500 mt-1">Connecting to {meme.sourceSubreddit || 'Reddit'}</span>
+                </div>
+              )}
+
+              <iframe
+                src={redditEmbedUrl}
+                title={meme.title}
+                sandbox="allow-scripts allow-same-origin allow-popups"
+                className="w-full h-[520px] border-0 bg-transparent relative z-10"
+                scrolling="no"
+                allowFullScreen
+                onLoad={() => setRedditIframeLoaded(true)}
+              />
+            </div>
+          </div>
+        ) : meme.youtubeId ? (
           <div className="w-full bg-black flex flex-col items-center">
             {loadEmbed ? (
               <div className="w-full aspect-[9/16] sm:aspect-[4/3] max-h-[580px] relative bg-black">
