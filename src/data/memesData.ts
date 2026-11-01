@@ -28,9 +28,6 @@ export const INITIAL_MEMES: Meme[] = [
     language: 'Hinglish',
     sourcePlatform: 'reddit',
     sourceSubreddit: 'r/IndianDankMemes',
-    mediaType: 'audio',
-    audioTitle: 'Sad Phonk Melodrama MP3',
-    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'Kota_Backlog_Survivor',
       handle: '@jee_dropper_2026',
@@ -53,9 +50,6 @@ export const INITIAL_MEMES: Meme[] = [
     situation: 'Ashneer Grover savage shark tank rejection',
     language: 'Hinglish',
     sourcePlatform: 'instagram',
-    mediaType: 'audio',
-    audioTitle: 'Ashneer: Yeh Sab Doglapan Hai MP3',
-    audioUrl: '/audio/dramatic-boom.wav',
     creator: {
       name: 'Desi Shark Roasts',
       handle: '@sharktank_uncut',
@@ -79,9 +73,6 @@ export const INITIAL_MEMES: Meme[] = [
     language: 'Hinglish',
     sourcePlatform: 'reddit',
     sourceSubreddit: 'r/desimemes',
-    mediaType: 'audio',
-    audioTitle: 'Arpit Bala: Hum Pe Toh Hai Hi 9 MP3',
-    audioUrl: '/audio/punchline.wav',
     creator: {
       name: 'Bhappa Fanclub',
       handle: '@arpit_bala_clips',
@@ -104,9 +95,6 @@ export const INITIAL_MEMES: Meme[] = [
     situation: 'Puneet Superstar shouting in muddy rainwater',
     language: 'Hindi',
     sourcePlatform: 'instagram',
-    mediaType: 'audio',
-    audioTitle: 'Lord Puneet Screaming Chaos MP3',
-    audioUrl: '/audio/dramatic-boom.wav',
     creator: {
       name: 'Lord Puneet Archives',
       handle: '@puneet_superstar_official',
@@ -152,9 +140,6 @@ export const INITIAL_MEMES: Meme[] = [
     situation: 'Munna bhaiya dialogue applied to group chats',
     language: 'Hinglish',
     sourcePlatform: 'instagram',
-    mediaType: 'audio',
-    audioTitle: 'Vine Boom Bass Drop MP3',
-    audioUrl: '/audio/vine-boom.wav',
     creator: {
       name: 'Mirzapur Meme Cell',
       handle: '@tripathi_parivar',
@@ -222,9 +207,6 @@ export const INITIAL_MEMES: Meme[] = [
     language: 'Hinglish',
     sourcePlatform: 'reddit',
     sourceSubreddit: 'r/IndianDankMemes',
-    mediaType: 'audio',
-    audioTitle: 'L Lag Gaye Emotional Violin MP3',
-    audioUrl: '/audio/sad-violin.wav',
     creator: {
       name: 'TCS_Wipro_Survivor',
       handle: '@notice_period_gang',

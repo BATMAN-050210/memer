@@ -3,11 +3,11 @@ import { Meme } from './types';
 import { INITIAL_MEMES } from './data/memesData';
 import { MemeFeedCard } from './components/MemeFeedCard';
 import { DiwaliSidebar } from './components/DiwaliSidebar';
-import { Search, X, Loader2, Sparkles, RefreshCw, Volume2, VolumeX, Film, Flame } from 'lucide-react';
+import { Search, X, Loader2, Sparkles, RefreshCw, Film, Flame } from 'lucide-react';
 import { extractFreshIndianDankMemes } from './services/memeExtractor';
-import { playPopSound, getAudioContext } from './utils/audio';
+import { playPopSound } from './utils/audio';
 
-type ChannelFilter = 'all' | 'my-memes' | 'idm' | 'links' | 'media' | 'dark';
+type ChannelFilter = 'all' | 'my-memes' | 'idm' | 'links' | 'dark';
 
 export function App() {
   const [memes, setMemes] = useState<Meme[]>(INITIAL_MEMES);
@@ -25,32 +25,7 @@ export function App() {
   const [mobileTab, setMobileTab] = useState<'feed' | 'diwali'>('feed');
   const [visibleCount, setVisibleCount] = useState(12);
   const [isFetchingExtra, setIsFetchingExtra] = useState(false);
-  const [globalSoundEnabled, setGlobalSoundEnabled] = useState(true);
   const loaderRef = useRef<HTMLDivElement>(null);
-
-  // Auto-enable & unlock mobile audio with full volume on phone touch
-  useEffect(() => {
-    const unlockMobileAudio = () => {
-      try {
-        const ctx = getAudioContext();
-        if (ctx && ctx.state === 'suspended') {
-          ctx.resume();
-        }
-      } catch (e) {
-        // ignore
-      }
-    };
-
-    window.addEventListener('touchstart', unlockMobileAudio, { passive: true, once: true });
-    window.addEventListener('click', unlockMobileAudio, { passive: true, once: true });
-    window.addEventListener('scroll', unlockMobileAudio, { passive: true, once: true });
-
-    return () => {
-      window.removeEventListener('touchstart', unlockMobileAudio);
-      window.removeEventListener('click', unlockMobileAudio);
-      window.removeEventListener('scroll', unlockMobileAudio);
-    };
-  }, []);
 
   // Background meme extraction from r/IndianDankMemes, r/desimemes, and Meme-API
   useEffect(() => {
@@ -123,8 +98,6 @@ export function App() {
           m.tags.includes('indiandankmemes') ||
           m.category === 'indian-dank'
       );
-    } else if (channelFilter === 'media') {
-      result = result.filter((m) => Boolean(m.audioUrl || m.videoUrl));
     } else if (channelFilter === 'dark') {
       result = result.filter((m) => m.humorLevel === 5);
     }
@@ -137,7 +110,6 @@ export function App() {
           m.title.toLowerCase().includes(q) ||
           m.caption.toLowerCase().includes(q) ||
           m.creator.handle.toLowerCase().includes(q) ||
-          (m.audioTitle && m.audioTitle.toLowerCase().includes(q)) ||
           m.tags.some((t) => t.toLowerCase().includes(q))
       );
     }
@@ -169,7 +141,6 @@ export function App() {
     { id: 'my-memes', label: '📁 My Uploads (15)' },
     { id: 'links', label: '🔗 Curated Reddit (16)' },
     { id: 'idm', label: '🇮🇳 r/IndianDankMemes' },
-    { id: 'media', label: '🔊 With MP3 Audio' },
     { id: 'dark', label: '💀 80% Dark' },
   ];
 
@@ -214,34 +185,6 @@ export function App() {
               )}
             </div>
           </div>
-
-          {/* Global Phone Volume ON / OFF toggle */}
-          <button
-            onClick={() => {
-              playPopSound();
-              setGlobalSoundEnabled((prev) => !prev);
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all active:scale-95 flex-shrink-0 ${
-              globalSoundEnabled
-                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-sm shadow-emerald-950/40'
-                : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-zinc-200'
-            }`}
-            title={globalSoundEnabled ? 'Volume is ON' : 'Volume is MUTED'}
-          >
-            {globalSoundEnabled ? (
-              <>
-                <Volume2 className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-                <span className="hidden xs:inline">Sound:</span>
-                <span>ON</span>
-              </>
-            ) : (
-              <>
-                <VolumeX className="w-3.5 h-3.5 text-zinc-400" />
-                <span className="hidden xs:inline">Sound:</span>
-                <span>MUTE</span>
-              </>
-            )}
-          </button>
 
           {/* Mobile Tab Switcher in Header for quick access */}
           <div className="lg:hidden flex items-center bg-zinc-900 border border-zinc-800 rounded-full p-0.5 flex-shrink-0">
@@ -336,7 +279,6 @@ export function App() {
                     meme={meme}
                     isLiked={likedMemeIds.includes(meme.id)}
                     onToggleLike={handleToggleLike}
-                    globalSoundEnabled={globalSoundEnabled}
                   />
                 </div>
               ))}

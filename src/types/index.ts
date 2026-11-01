@@ -44,9 +44,7 @@ export interface Meme {
   imageUrl: string;
   videoUrl?: string;
   youtubeId?: string;
-  audioUrl?: string;
-  audioTitle?: string;
-  mediaType?: 'image' | 'video' | 'youtube' | 'audio';
+  mediaType?: 'image' | 'video' | 'youtube';
   sourcePlatform?: 'reddit' | 'instagram' | 'youtube' | 'original';
   sourceSubreddit?: string;
   sourceUrl?: string;

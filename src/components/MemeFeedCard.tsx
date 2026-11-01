@@ -1,55 +1,35 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Meme } from '../types';
-import { Heart, Share2, Check, Play, Pause, Volume2, VolumeX, ExternalLink, Sparkles } from 'lucide-react';
+import { Heart, Share2, Check, Play, Pause, Volume2, VolumeX, ExternalLink } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import {
-  playPopSound,
-  playFlameSound,
-  playVineBoomSound,
-  playSadViolinSound,
-  playPunchlineSound,
-} from '../utils/audio';
+import { playPopSound, playFlameSound } from '../utils/audio';
 
 interface MemeFeedCardProps {
   meme: Meme;
   isLiked: boolean;
   onToggleLike: (meme: Meme) => void;
-  globalSoundEnabled?: boolean;
 }
 
 export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
   meme,
   isLiked,
   onToggleLike,
-  globalSoundEnabled = true,
 }) => {
   const [likeCount, setLikeCount] = useState(meme.stats.likes + (isLiked ? 1 : 0));
   const [showHeartBurst, setShowHeartBurst] = useState(false);
   const [shareToast, setShareToast] = useState(false);
 
-  // Audio MP3 state - unmuted by default when globalSoundEnabled is true
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-  const [isMuted, setIsMuted] = useState(!globalSoundEnabled);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  // Synchronize audio state when user toggles sound mode
-  useEffect(() => {
-    setIsMuted(!globalSoundEnabled);
-    if (!globalSoundEnabled && audioRef.current) {
-      audioRef.current.pause();
-      setIsPlayingAudio(false);
-    }
-  }, [globalSoundEnabled]);
-
   // HTML5 Video state
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+  const [isVideoMuted, setIsVideoMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   // YouTube Shorts Embed state
   const [loadEmbed, setLoadEmbed] = useState(false);
 
-  // Reddit Video Embed state - configured for volume ON by default
-  const [redditIframeLoaded, setRedditIframeLoaded] = useState(false);
+  // Reddit Video Embed state
+  const [redditLoaded, setRedditLoaded] = useState(false);
+
   const getRedditEmbedUrl = (url?: string) => {
     if (!url) return null;
     try {
@@ -57,71 +37,28 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
       if (!parsed.hostname.includes('reddit.com')) return null;
       let pathname = parsed.pathname;
       pathname = pathname.replace(/\/+$/, '') + '/';
-      return `https://www.redditmedia.com${pathname}?ref_source=embed&ref=share&embed=true&theme=dark&showmedia=true&muted=0&mute=false&volume=100`;
+      return `https://embed.reddit.com${pathname}?embed=true&showmedia=true&theme=dark`;
     } catch {
       return null;
     }
   };
+
   const redditEmbedUrl =
     meme.sourcePlatform === 'reddit' && meme.sourceUrl ? getRedditEmbedUrl(meme.sourceUrl) : null;
 
-  // Stop audio on unmount
+  // Re-trigger Reddit embed parser when card mounts
   useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
+    if (redditEmbedUrl) {
+      try {
+        const rembeddit = (window as any).rembeddit || (window as any).__rembeddit;
+        if (rembeddit && typeof rembeddit.init === 'function') {
+          rembeddit.init();
+        }
+      } catch (e) {
+        // ignore
       }
-    };
-  }, []);
-
-  const toggleAudio = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    playPopSound();
-
-    if (!audioRef.current && meme.audioUrl) {
-      const audio = new Audio(meme.audioUrl);
-      audio.loop = true;
-      audio.volume = 1.0;
-      audio.muted = false;
-      audio.onended = () => setIsPlayingAudio(false);
-      audioRef.current = audio;
     }
-
-    if (audioRef.current) {
-      if (isPlayingAudio) {
-        audioRef.current.pause();
-        setIsPlayingAudio(false);
-      } else {
-        audioRef.current
-          .play()
-          .then(() => setIsPlayingAudio(true))
-          .catch((err) => {
-            console.warn('Audio element playback blocked, using Web Audio fallback:', err);
-            // Instant synthesized Web Audio fallback
-            if (meme.audioTitle?.toLowerCase().includes('boom') || meme.audioTitle?.toLowerCase().includes('drop')) {
-              playVineBoomSound();
-            } else if (meme.audioTitle?.toLowerCase().includes('violin') || meme.audioTitle?.toLowerCase().includes('sad')) {
-              playSadViolinSound();
-            } else {
-              playPunchlineSound();
-            }
-            setIsPlayingAudio(true);
-            setTimeout(() => setIsPlayingAudio(false), 2200);
-          });
-      }
-    } else {
-      // Direct Web Audio if no audioRef
-      if (meme.audioTitle?.toLowerCase().includes('boom')) {
-        playVineBoomSound();
-      } else if (meme.audioTitle?.toLowerCase().includes('violin')) {
-        playSadViolinSound();
-      } else {
-        playPunchlineSound();
-      }
-      setIsPlayingAudio(true);
-      setTimeout(() => setIsPlayingAudio(false), 2200);
-    }
-  };
+  }, [redditEmbedUrl]);
 
   const toggleVideoPlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -139,7 +76,7 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
     e.stopPropagation();
     if (!videoRef.current) return;
     videoRef.current.muted = !videoRef.current.muted;
-    setIsMuted(videoRef.current.muted);
+    setIsVideoMuted(videoRef.current.muted);
   };
 
   const triggerLike = () => {
@@ -173,24 +110,28 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
       url: shareUrl,
     };
 
-    // Native mobile share drawer (Instagram, WhatsApp, Messages, etc.)
     if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
       try {
         await navigator.share(shareData);
         return;
-      } catch (err) {
-        // User dismissed share dialog
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
       }
     }
 
-    // Fallback: Copy link & show toast + WhatsApp redirect if clicked
     try {
-      await navigator.clipboard.writeText(`${meme.title} - ${meme.caption}\n${shareUrl}`);
+      await navigator.clipboard.writeText(shareUrl);
       setShareToast(true);
       setTimeout(() => setShareToast(false), 2200);
     } catch {
-      const waText = encodeURIComponent(`😂 *${meme.title}*\n\n"${meme.caption}"\n\n${shareUrl}`);
-      window.open(`https://api.whatsapp.com/send?text=${waText}`, '_blank');
+      const textarea = document.createElement('textarea');
+      textarea.value = shareUrl;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2200);
     }
   };
 
@@ -200,7 +141,6 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
     return num.toString();
   };
 
-  // Badge label & colors
   const getSourceBadge = () => {
     if (meme.category === 'tanmay-reacts' || meme.tags.includes('tanmaybhat')) {
       return { text: '🎬 Tanmay Reacts', color: 'bg-rose-500/10 text-rose-400 border-rose-500/30' };
@@ -245,7 +185,6 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
           </div>
         </div>
 
-        {/* Channel / Source indicator */}
         <span className={`text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${badge.color}`}>
           {badge.text}
         </span>
@@ -257,17 +196,14 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
         {/* Case 0: Reddit Video Post Embed */}
         {redditEmbedUrl ? (
           <div className="w-full bg-[#0a0a0c] flex flex-col items-center">
-            {/* Top Reddit Subreddit Bar */}
-            <div className="w-full px-4 py-2 bg-gradient-to-r from-orange-950/40 via-zinc-900 to-black flex items-center justify-between border-b border-orange-500/20">
+            {/* Top Reddit Audio & Video Action Banner */}
+            <div className="w-full px-4 py-2.5 bg-gradient-to-r from-orange-950/40 via-zinc-900 to-black flex items-center justify-between border-b border-orange-500/20">
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-[#FF4500] flex items-center justify-center text-white font-black text-[10px] shadow-sm">
+                <span className="w-6 h-6 rounded-full bg-[#FF4500] flex items-center justify-center text-white font-black text-xs shadow-sm">
                   r/
                 </span>
-                <span className="font-bold text-xs text-orange-400">
+                <span className="font-bold text-xs sm:text-sm text-orange-400">
                   {meme.sourceSubreddit || 'Reddit Video Meme'}
-                </span>
-                <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">
-                  {meme.creator.handle}
                 </span>
               </div>
               <a
@@ -275,55 +211,20 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FF4500]/20 hover:bg-[#FF4500]/30 text-orange-300 hover:text-white text-[11px] font-semibold border border-orange-500/30 transition-all hover:scale-105 active:scale-95"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FF4500] hover:bg-[#FF5722] text-white text-xs font-bold shadow-md transition-all hover:scale-105 active:scale-95"
               >
-                <span>▶ Watch on Reddit</span>
-                <ExternalLink className="w-3 h-3" />
+                <Volume2 className="w-3.5 h-3.5" />
+                <span>Play Sound on Reddit</span>
+                <ExternalLink className="w-3 h-3 ml-0.5" />
               </a>
-            </div>
-
-            {/* Reddit Audio & Mobile Unmute guidance bar */}
-            <div className="w-full px-4 py-2 bg-gradient-to-r from-zinc-900 via-[#151518] to-zinc-900 border-b border-zinc-800/80 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="flex h-2 w-2 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span className="text-zinc-300 text-[11px] font-medium">
-                  Phone Mode: <strong className="text-emerald-400 font-semibold">🔊 Volume ON</strong>
-                </span>
-              </div>
-              {meme.audioUrl && (
-                <button
-                  onClick={toggleAudio}
-                  className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold border transition-all ${
-                    isPlayingAudio
-                      ? 'bg-rose-500 text-white border-rose-400 shadow-sm shadow-rose-500/30'
-                      : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border-zinc-700 active:scale-95'
-                  }`}
-                  title="Play / Pause meme soundbite"
-                >
-                  {isPlayingAudio ? (
-                    <>
-                      <Pause className="w-3 h-3 text-white" />
-                      <span>Soundbite Playing</span>
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-3 h-3 text-emerald-400 fill-emerald-400" />
-                      <span>🔊 Play Soundbite</span>
-                    </>
-                  )}
-                </button>
-              )}
             </div>
 
             {/* Playable Reddit Video Embed Container */}
             <div className="relative w-full min-h-[480px] sm:min-h-[520px] bg-black flex items-center justify-center overflow-hidden">
-              {!redditIframeLoaded && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-zinc-950 pointer-events-none">
+              {!redditLoaded && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-zinc-950 pointer-events-none z-0">
                   <div className="w-10 h-10 rounded-full border-2 border-orange-500 border-t-transparent animate-spin mb-3"></div>
-                  <span className="text-xs font-semibold text-zinc-300">Loading Reddit Video...</span>
+                  <span className="text-xs font-semibold text-zinc-300">Loading Reddit Video Player...</span>
                   <span className="text-[10px] text-zinc-500 mt-1">Connecting to {meme.sourceSubreddit || 'Reddit'}</span>
                 </div>
               )}
@@ -335,11 +236,12 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
                 className="w-full h-[520px] border-0 bg-transparent relative z-10"
                 scrolling="no"
                 allowFullScreen
-                onLoad={() => setRedditIframeLoaded(true)}
+                onLoad={() => setRedditLoaded(true)}
               />
             </div>
           </div>
         ) : meme.youtubeId ? (
+          /* Case A: YouTube Short / Video */
           <div className="w-full bg-black flex flex-col items-center">
             {loadEmbed ? (
               <div className="w-full aspect-[9/16] sm:aspect-[4/3] max-h-[580px] relative bg-black">
@@ -352,7 +254,6 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
                 />
               </div>
             ) : (
-              /* High quality Short Thumbnail with click-to-play & direct link */
               <div
                 className="relative w-full aspect-[9/16] sm:aspect-[4/3] max-h-[520px] bg-zinc-950 flex flex-col items-center justify-center cursor-pointer group overflow-hidden"
                 onClick={() => setLoadEmbed(true)}
@@ -400,7 +301,7 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
             )}
           </div>
         ) : meme.videoUrl ? (
-          /* Case B: HTML5 Video Post */
+          /* Case B: HTML5 Video Post with Native Sound Controls */
           <div
             className="relative w-full aspect-square sm:aspect-[4/3] max-h-[560px] bg-black cursor-pointer group"
             onClick={toggleVideoPlay}
@@ -411,29 +312,21 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
               src={meme.videoUrl}
               className="w-full h-full object-contain"
               loop
+              controls
               playsInline
               autoPlay
-              muted={isMuted}
+              muted={isVideoMuted}
             />
 
-            {/* Video Control Overlays */}
-            <div className="absolute top-3 right-3 flex items-center gap-2">
+            <div className="absolute top-3 right-3 flex items-center gap-2 pointer-events-auto">
               <button
                 onClick={toggleVideoMute}
-                className="p-1.5 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-sm transition-all"
-                title={isMuted ? 'Unmute' : 'Mute'}
+                className="p-2 rounded-full bg-black/70 hover:bg-black/90 text-white backdrop-blur-sm transition-all"
+                title={isVideoMuted ? 'Unmute video audio' : 'Mute video audio'}
               >
-                {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                {isVideoMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
               </button>
             </div>
-
-            {!isVideoPlaying && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
-                <div className="w-12 h-12 rounded-full bg-black/70 flex items-center justify-center text-white">
-                  <Play className="w-6 h-6 ml-0.5" />
-                </div>
-              </div>
-            )}
           </div>
         ) : (
           /* Case C: Standard Image Meme */
@@ -462,47 +355,7 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
         )}
       </div>
 
-      {/* 3. Audio / MP3 Bar if meme has soundbite */}
-      {meme.audioUrl && (
-        <div className="px-4 py-2.5 bg-zinc-900/70 border-b border-zinc-800/60 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <button
-              onClick={toggleAudio}
-              className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
-                isPlayingAudio
-                  ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/30'
-                  : 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700'
-              }`}
-              title={isPlayingAudio ? 'Pause MP3' : 'Play MP3 audio'}
-            >
-              {isPlayingAudio ? (
-                <Pause className="w-3.5 h-3.5" />
-              ) : (
-                <Play className="w-3.5 h-3.5 ml-0.5" />
-              )}
-            </button>
-
-            <div className="flex-1 min-w-0">
-              <span className="text-[11px] font-semibold text-zinc-200 truncate block">
-                {meme.audioTitle || '🎵 Funny Audio MP3'}
-              </span>
-              <span className="text-[9px] text-zinc-500 block">
-                {isPlayingAudio ? 'Now playing soundbite' : 'Tap to play background audio'}
-              </span>
-            </div>
-          </div>
-
-          {/* Equalizer animation when playing */}
-          <div className="flex items-end gap-0.5 h-4 px-2">
-            <span className={`w-0.5 bg-rose-400 rounded-full transition-all ${isPlayingAudio ? 'h-4 animate-pulse' : 'h-1.5'}`}></span>
-            <span className={`w-0.5 bg-rose-500 rounded-full transition-all ${isPlayingAudio ? 'h-3 animate-pulse delay-75' : 'h-1'}`}></span>
-            <span className={`w-0.5 bg-rose-400 rounded-full transition-all ${isPlayingAudio ? 'h-4 animate-pulse delay-150' : 'h-2'}`}></span>
-            <span className={`w-0.5 bg-rose-500 rounded-full transition-all ${isPlayingAudio ? 'h-2 animate-pulse delay-100' : 'h-1.5'}`}></span>
-          </div>
-        </div>
-      )}
-
-      {/* 4. Controls: Clean & Clear ONLY SCROLL, LIKE, AND SHARE */}
+      {/* 3. Controls: Clean & Clear ONLY SCROLL, LIKE, AND SHARE */}
       <div className="p-3.5 sm:p-4 bg-[#121215]">
         
         <div className="flex items-center justify-between pb-2.5">
@@ -526,7 +379,7 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
             </span>
           </button>
 
-          {/* Share Button (triggers native mobile share or copy link) */}
+          {/* Share Button */}
           <button
             onClick={handleShare}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-300 hover:text-white text-xs font-medium border border-zinc-700/50 transition-all active:scale-95"
@@ -546,7 +399,7 @@ export const MemeFeedCard: React.FC<MemeFeedCardProps> = ({
           </button>
         </div>
 
-        {/* 5. Meme Content: Title & Caption */}
+        {/* 4. Meme Content: Title & Caption */}
         <div className="space-y-1">
           <h4 className="font-bold text-sm sm:text-base text-zinc-100 leading-snug">
             {meme.title}
